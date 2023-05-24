@@ -1,0 +1,19 @@
+SELECT
+    b.dwid,
+    b.is_attempt,
+    b.is_contact,
+    a.e2022gvm_final,
+    b.in_any,
+    b.attempt_mode,
+    b.Region,
+    b.datecanvassed
+FROM
+    dbt_prod.int_catalist_binned_universe_final a
+    JOIN dbt_prod.int_attempt_final b ON a.dwid = b.dwid
+    AND a.statecode = b.statecode
+WHERE
+    b.statecode = 'CO'
+    AND datecanvassed BETWEEN '01-01-2022'
+    AND '11-09-2022'
+    AND b.attempt_mode = 'Doors'
+    AND b.in_any = 1
