@@ -1,0 +1,15 @@
+SELECT
+    b.statefileid,
+    a.datecanvassed,
+    a.attempt_mode,
+    a.congressionaldistrict
+FROM
+    dbt_prod.int_attempt_final a
+    LEFT JOIN catalist.co_person_20230611 b ON a.dwid = b.dwid
+    AND a.statecode = b.statecode
+WHERE
+    a.statecode = 'CO'
+    AND a.datecanvassed BETWEEN '2022-04-01'
+    AND '2022-11-09'
+    AND a.attempt_mode IN ('Doors', 'Phones')
+    AND a.congressionaldistrict IN (7, 8)
