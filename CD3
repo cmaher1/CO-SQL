@@ -1,0 +1,23 @@
+SELECT
+    DISTINCT(dwid),
+    voterstatus,
+    e2020gvm,
+    e2022gvm,
+    statehousedistrict,
+    statesenatedistrict,
+    age,
+    bin_age,
+    race,
+    gender,
+    partyaffiliation,
+    catalistmodel_income_bin,
+    catalist_vci22,
+    in_any,
+    in_gotv,
+    is_canvassable
+FROM
+    dbt_prod.int_catalist_binned_universe_final
+WHERE
+    statecode = 'CO'
+    AND voterstatus IN ('active', 'inactive')
+    AND congressionaldistrict = 3
