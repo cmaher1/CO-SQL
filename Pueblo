@@ -1,0 +1,25 @@
+SELECT
+    DISTINCT(a.dwid),
+    b.municipaldistrict,
+    a.voterstatus,
+    c.e2019gvm,
+    c.e2021gvm,
+    a.statehousedistrict,
+    a.statesenatedistrict,
+    a.age,
+    a.bin_age,
+    a.race,
+    a.gender,
+    a.partyaffiliation,
+    a.catalistmodel_income_bin,
+    a.catalist_vci22,
+    a.in_any,
+    a.in_gotv,
+    a.is_canvassable
+FROM
+    dbt_prod.int_catalist_binned_universe_final a
+    LEFT JOIN catalist.co_districts_20230611 b on a.dwid = b.dwid
+    LEFT JOIN catalist.co_vhist_20230611 c ON a.dwid = c.dwid
+WHERE
+    a.statecode = 'CO'
+    AND b.municipaldistrict = 'CITY OF PUEBLO'
