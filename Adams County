@@ -1,0 +1,29 @@
+SELECT
+    DISTINCT(a.dwid),
+    b.municipaldistrict,
+    b.ward,
+    a.voterstatus,
+    c.e2019gvm,
+    c.e2021gvm,
+    c.e2022gvm,
+    a.age,
+    a.bin_age,
+    a.race,
+    a.gender,
+    a.partyaffiliation,
+    a.catalistmodel_income_bin,
+    a.catalist_vci22,
+    a.bin_vci_decile,
+    a.catalist_voteprop22,
+    a.bin_voteprop_decile
+FROM
+    dbt_prod.int_catalist_binned_universe_final a
+    LEFT JOIN catalist.co_districts_20230611 b on a.dwid = b.dwid
+    LEFT JOIN catalist.co_vhist_20230611 c ON a.dwid = c.dwid
+WHERE
+    a.statecode = 'CO'
+    AND b.municipaldistrict IN (
+        'CITY OF THORNTON',
+        'CITY OF COMMERCE CITY',
+        'CITY OF WESTMINSTER'
+    )
