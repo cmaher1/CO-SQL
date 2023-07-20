@@ -84,7 +84,94 @@ SELECT
             ELSE 0
         END
     ) AS NAM,
-    AVG(b.catalist_vci22) AS avg_vci
+    SUM(
+        CASE
+            WHEN b.age > 17
+            AND b.age < 25 THEN 1
+            ELSE 0
+        END
+    ) AS age_18_24,
+    SUM(
+        CASE
+            WHEN b.age > 24
+            AND b.age < 35 THEN 1
+            ELSE 0
+        END
+    ) AS age_25_34,
+    SUM(
+        CASE
+            WHEN b.age > 34
+            AND b.age < 50 THEN 1
+            ELSE 0
+        END
+    ) AS age_35_49,
+    SUM(
+        CASE
+            WHEN b.age > 49
+            AND b.age < 65 THEN 1
+            ELSE 0
+        END
+    ) AS age_50_64,
+    SUM(
+        CASE
+            WHEN b.age > 64 THEN 1
+            ELSE 0
+        END
+    ) AS age_65,
+    SUM(
+        CASE
+            WHEN b.gender = 'female'
+            AND c.catalistsynthetic_married = 'S' THEN 1
+            ELSE 0
+        END
+    ) AS single_women,
+    SUM(
+        CASE
+            WHEN b.gender = 'male'
+            AND c.catalistsynthetic_married = 'S' THEN 1
+            ELSE 0
+        END
+    ) AS single_men,
+    SUM(
+        CASE
+            WHEN b.gender = 'female'
+            AND c.catalistsynthetic_married = 'M' THEN 1
+            ELSE 0
+        END
+    ) AS married_women,
+    SUM(
+        CASE
+            WHEN b.gender = 'male'
+            AND c.catalistsynthetic_married = 'M' THEN 1
+            ELSE 0
+        END
+    ) AS married_men,
+    SUM(
+        CASE
+            WHEN b.bin_income = '0 - 50K' THEN 1
+            ELSE 0
+        END
+    ) AS income_0_50,
+    SUM(
+        CASE
+            WHEN b.bin_income = '50K - 100K' THEN 1
+            ELSE 0
+        END
+    ) AS income_50_100,
+    SUM(
+        CASE
+            WHEN b.bin_income = '100K - 150K' THEN 1
+            ELSE 0
+        END
+    ) AS income_100_150,
+    SUM(
+        CASE
+            WHEN b.bin_income = '150K+' THEN 1
+            ELSE 0
+        END
+    ) AS income_150,
+    AVG(b.catalist_vci22) AS avg_vci,
+    AVG(b.catalist_voteprop22) AS avg_voteprop
 FROM
     colorado_08.profile_coco_membership_2023 a
     LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.DWID = b.DWID
