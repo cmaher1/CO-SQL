@@ -1,0 +1,93 @@
+SELECT
+    COUNT(DISTINCT a.DWID) AS total_matched,
+    SUM(
+        CASE
+            WHEN b.voterstatus = 'active' THEN 1
+            ELSE 0
+        END
+    ) AS active,
+    SUM(
+        CASE
+            WHEN b.voterstatus = 'inactive' THEN 1
+            ELSE 0
+        END
+    ) AS inactive,
+    SUM(
+        CASE
+            WHEN b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS registered,
+    SUM(
+        CASE
+            WHEN b.voterstatus = 'dropped' THEN 1
+            ELSE 0
+        END
+    ) AS dropped,
+    SUM(
+        CASE
+            WHEN b.partyaffiliation = 'DEM' THEN 1
+            ELSE 0
+        END
+    ) AS dem,
+    SUM(
+        CASE
+            WHEN b.partyaffiliation = 'REP' THEN 1
+            ELSE 0
+        END
+    ) AS rep,
+    SUM(
+        CASE
+            WHEN b.partyaffiliation NOT IN ('DEM', 'REP') THEN 1
+            ELSE 0
+        END
+    ) AS unaffiliated,
+    SUM(
+        CASE
+            WHEN b.race = 'black' THEN 1
+            ELSE 0
+        END
+    ) AS black,
+    SUM(
+        CASE
+            WHEN b.race = 'hispanic' THEN 1
+            ELSE 0
+        END
+    ) AS latinx,
+    SUM(
+        CASE
+            WHEN b.race = 'asian' THEN 1
+            ELSE 0
+        END
+    ) AS aapi,
+    SUM(
+        CASE
+            WHEN b.age > 16
+            AND b.age < 35 THEN 1
+            ELSE 0
+        END
+    ) AS age_17_34,
+    SUM(
+        CASE
+            WHEN b.gender = 'female'
+            AND c.catalistsynthetic_married = 'S' THEN 1
+            ELSE 0
+        END
+    ) AS single_women,
+    SUM(
+        CASE
+            WHEN b.race IN ('asian', 'black', 'hispanic')
+            OR b.age > 16
+            AND b.age < 35
+            OR b.gender = 'female'
+            AND c.catalistsynthetic_married = 'S' THEN 1
+            ELSE 0
+        END
+    ) AS NAM,
+    AVG(b.catalist_vci22) AS avg_vci
+FROM
+    colorado_08.profile_coco_membership_2023 a
+    LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.DWID = b.DWID
+    AND b.statecode = 'CO'
+    LEFT JOIN catalist.co_model_20230311 c ON a.DWID = c.DWID
+    AND b.statecode = 'CO'
