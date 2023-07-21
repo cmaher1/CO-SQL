@@ -71,7 +71,7 @@ SELECT
             WHEN b.race = 'other' THEN 1
             ELSE 0
         END
-    ) AS other,
+    ) AS other_race,
     SUM(
         CASE
             WHEN b.age > 16
@@ -90,7 +90,8 @@ SELECT
         CASE
             WHEN b.race IN ('asian', 'black', 'hispanic')
             OR (
-                b.age BETWEEN 16 and 35
+                b.age BETWEEN 16
+                and 35
             )
             OR (
                 b.gender = 'female'
@@ -258,10 +259,42 @@ SELECT
         END
     ) AS voteprop_90_100,
     AVG(b.catalist_vci22) AS avg_vci,
-    AVG(b.catalist_voteprop22) AS avg_voteprop
+    AVG(b.catalist_voteprop22) AS avg_voteprop,
+    SUM(
+        CASE
+            WHEN b.race = 'caucasian' THEN 1
+            ELSE 0
+        END
+    ) AS white,
+    SUM(
+        CASE
+            WHEN b.mailaddrisbad = 'FALSE' THEN 1
+            ELSE 0
+        END
+    ) AS good_address,
+    SUM(
+        CASE
+            WHEN d.likely_cell_phone IS NOT NULL THEN 1
+            ELSE 0
+        END
+    ) AS likely_cell,
+    SUM(
+        CASE
+            WHEN b.best_phone_type IS NOT NULL THEN 1
+            ELSE 0
+        END
+    ) AS any_phone,
+    SUM(
+        CASE
+            WHEN b.e2022gvm_final IS NOT NULL THEN 1
+            ELSE 0
+        END
+    ) AS voted_22
 FROM
     colorado_08.profile_coco_membership_2023 a
     LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.DWID = b.DWID
     AND b.statecode = 'CO'
     LEFT JOIN catalist.co_model_20230311 c ON a.DWID = c.DWID
-    AND b.statecode = 'CO'
+    AND c.statecode = 'CO'
+    LEFT JOIN catalist.co_phones_20200417 d ON a.DWID = d.DWID
+    AND d.statecode = 'CO'
