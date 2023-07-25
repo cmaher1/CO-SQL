@@ -289,7 +289,55 @@ SELECT
             WHEN b.e2022gvm_final IS NOT NULL THEN 1
             ELSE 0
         END
-    ) AS voted_22
+    ) AS voted_22,
+    CAST(
+        SUM(
+            CASE
+                WHEN b.e2022gvm IN ('polling', 'earlyVote', 'absentee', 'unknown') THEN 1
+                ELSE 0
+            END
+        ) AS FLOAT
+    ) / COUNT(e2022gvm) AS vspc_2022,
+    CAST(
+        SUM(
+            CASE
+                WHEN b.e2022gvm = 'mail' THEN 1
+                ELSE 0
+            END
+        ) AS FLOAT
+    ) / COUNT(e2022gvm) AS mail_2022,
+    CAST(
+        SUM(
+            CASE
+                WHEN b.e2022gvm IN ('polling', 'earlyVote', 'absentee', 'unknown') THEN 1
+                ELSE 0
+            END
+        ) AS FLOAT
+    ) / COUNT(e2020gvm) AS vspc_2020,
+    CAST(
+        SUM(
+            CASE
+                WHEN b.e2020gvm = 'mail' THEN 1
+                ELSE 0
+            END
+        ) AS FLOAT
+    ) / COUNT(e2020gvm) AS mail_2020,
+    CAST(
+        SUM(
+            CASE
+                WHEN b.e2018gvm IN ('polling', 'earlyVote', 'absentee', 'unknown') THEN 1
+                ELSE 0
+            END
+        ) AS FLOAT
+    ) / COUNT(e2018gvm) AS vspc_2018,
+    CAST(
+        SUM(
+            CASE
+                WHEN b.e2018gvm = 'mail' THEN 1
+                ELSE 0
+            END
+        ) AS FLOAT
+    ) / COUNT(e2018gvm) AS mail_2018
 FROM
     colorado_08.profile_coco_membership_2023 a
     LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.DWID = b.DWID
