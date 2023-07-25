@@ -1,0 +1,47 @@
+SELECT
+    b.congressionaldistrict,
+    COUNT(*)
+FROM
+    colorado_08.profile_coco_membership_2023 a
+    LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.dwid = b.dwid
+    AND b.statecode = 'CO'
+WHERE
+    b.congressionaldistrict IS NOT NULL
+GROUP BY
+    1
+ORDER BY
+    1 ASC
+LIMIT
+    8
+
+---
+
+SELECT
+    b.statesenatedistrict,
+    COUNT(*)
+FROM
+    colorado_08.profile_coco_membership_2023 a
+    LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.dwid = b.dwid
+    AND b.statecode = 'CO'
+WHERE
+    b.statesenatedistrict IS NOT NULL
+GROUP BY
+    1
+ORDER BY
+    1 ASC
+
+---
+
+SELECT
+    b.statehousedistrict,
+    COUNT(*)
+FROM
+    colorado_08.profile_coco_membership_2023 a
+    LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.dwid = b.dwid
+    AND b.statecode = 'CO'
+WHERE
+    b.statehousedistrict IS NOT NULL
+GROUP BY
+    1
+ORDER BY
+    1 ASC
