@@ -309,7 +309,7 @@ SELECT
     CAST(
         SUM(
             CASE
-                WHEN b.e2022gvm IN ('polling', 'earlyVote', 'absentee', 'unknown') THEN 1
+                WHEN b.e2020gvm IN ('polling', 'earlyVote', 'absentee', 'unknown') THEN 1
                 ELSE 0
             END
         ) AS FLOAT
