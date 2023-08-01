@@ -2,7 +2,7 @@ SELECT
     b.countyname,
     COUNT(*)
 FROM
-    colorado_08.profile_coco_membership_2023 a
+    colorado_08.profile_newera_membership_2023 a
     LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.dwid = b.dwid
     AND b.statecode = 'CO'
 WHERE
@@ -12,7 +12,7 @@ GROUP BY
 ORDER BY
     2 DESC
 LIMIT
-    14
+    144
 
 SELECT
     b.congressionaldistrict,
