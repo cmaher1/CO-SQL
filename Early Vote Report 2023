@@ -1,0 +1,433 @@
+SELECT
+    a.regaddrcity,
+    COUNT(a.DWID),
+    SUM(
+        CASE
+            WHEN a.voterstatus = 'active' THEN 1
+            ELSE 0
+        END
+    ) AS active,
+    SUM(
+        CASE
+            WHEN a.voterstatus = 'inactive' THEN 1
+            ELSE 0
+        END
+    ) AS inactive,
+    SUM(
+        CASE
+            WHEN a.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS registered,
+    SUM(
+        CASE
+            WHEN a.voterstatus = 'dropped' THEN 1
+            ELSE 0
+        END
+    ) AS dropped,
+    SUM(
+        CASE
+            WHEN b.partyaffiliation = 'DEM'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS dem,
+    SUM(
+        CASE
+            WHEN b.partyaffiliation = 'REP'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS rep,
+    SUM(
+        CASE
+            WHEN b.partyaffiliation NOT IN ('DEM', 'REP')
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS unaffiliated,
+    SUM(
+        CASE
+            WHEN b.race = 'black'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS black,
+    SUM(
+        CASE
+            WHEN b.race = 'hispanic'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS latinx,
+    SUM(
+        CASE
+            WHEN b.race = 'asian'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS aapi,
+    SUM(
+        CASE
+            WHEN b.race = 'nativeAmerican'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS nat_am,
+    SUM(
+        CASE
+            WHEN b.race = 'other'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS other_race,
+    SUM(
+        CASE
+            WHEN b.age > 16
+            AND b.age < 35
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS age_17_34,
+    SUM(
+        CASE
+            WHEN b.gender = 'female'
+            AND c.catalistsynthetic_married = 'S'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS single_women,
+    SUM(
+        CASE
+            WHEN b.race IN ('asian', 'black', 'hispanic')
+            AND b.voterstatus IN ('active', 'inactive')
+            OR (
+                b.age BETWEEN 16
+                and 35
+                AND b.voterstatus IN ('active', 'inactive')
+            )
+            OR (
+                b.gender = 'female'
+                AND b.voterstatus IN ('active', 'inactive')
+                AND c.catalistsynthetic_married = 'S'
+                AND b.voterstatus IN ('active', 'inactive')
+            ) THEN 1
+            ELSE 0
+        END
+    ) AS NAM,
+    SUM(
+        CASE
+            WHEN b.age > 17
+            AND b.age < 25
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS age_18_24,
+    SUM(
+        CASE
+            WHEN b.age > 24
+            AND b.age < 35
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS age_25_34,
+    SUM(
+        CASE
+            WHEN b.age > 34
+            AND b.age < 50
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS age_35_49,
+    SUM(
+        CASE
+            WHEN b.age > 49
+            AND b.age < 65
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS age_50_64,
+    SUM(
+        CASE
+            WHEN b.age > 64
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS age_65,
+    SUM(
+        CASE
+            WHEN b.gender = 'female'
+            AND c.catalistsynthetic_married = 'S'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS single_women,
+    SUM(
+        CASE
+            WHEN b.gender = 'male'
+            AND c.catalistsynthetic_married = 'S'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS single_men,
+    SUM(
+        CASE
+            WHEN b.gender = 'female'
+            AND c.catalistsynthetic_married = 'M'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS married_women,
+    SUM(
+        CASE
+            WHEN b.gender = 'male'
+            AND c.catalistsynthetic_married = 'M'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS married_men,
+    SUM(
+        CASE
+            WHEN b.bin_income = '0 - 50K'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS income_0_50,
+    SUM(
+        CASE
+            WHEN b.bin_income = '50K - 100K'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS income_50_100,
+    SUM(
+        CASE
+            WHEN b.bin_income = '100K - 150K'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS income_100_150,
+    SUM(
+        CASE
+            WHEN b.bin_income = '150K+'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS income_150,
+    SUM(
+        CASE
+            WHEN b.bin_education_collapsed = 'College'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS likely_college,
+    SUM(
+        CASE
+            WHEN b.bin_education_collapsed = 'Non-College'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS likely_non_college,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '0-10'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_0_10,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '10-20'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_10_20,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '20-30'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_20_30,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '30-40'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_30_40,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '40-50'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_40_50,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '50-60'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_50_60,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '60-70'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_60_70,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '70-80'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_70_80,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '80-90'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_80_90,
+    SUM(
+        CASE
+            WHEN b.bin_voteprop_decile = '90-100'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voteprop_90_100,
+    SUM(
+        CASE
+            WHEN b.catalist_vci22 IS NOT NULL
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS avg_vci,
+    SUM(
+        CASE
+            WHEN b.catalist_voteprop22 IS NOT NULL
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS avg_voteprop,
+    SUM(
+        CASE
+            WHEN b.race = 'caucasian'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS white,
+    SUM(
+        CASE
+            WHEN b.mailaddrisbad = 'FALSE'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS good_address,
+    SUM(
+        CASE
+            WHEN d.likely_cell_phone IS NOT NULL
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS likely_cell,
+    SUM(
+        CASE
+            WHEN b.best_phone_type IS NOT NULL
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS any_phone,
+    SUM(
+        CASE
+            WHEN e2022gvm IS NOT NULL
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS voted_22,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '0-10'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_0_10,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '10-20'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_10_20,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '20-30'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_20_30,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '30-40'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_30_40,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '40-50'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_40_50,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '50-60'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_50_60,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '60-70'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_60_70,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '70-80'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_70_80,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '80-90'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_80_90,
+    SUM(
+        CASE
+            WHEN b.bin_vci_decile = '90-100'
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS vci_90_100
+FROM
+    catalist.co_person_20231204 a
+    LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.DWID = b.DWID
+    AND b.statecode = 'CO'
+    LEFT JOIN catalist.co_model_20230311 c ON a.DWID = c.DWID
+    AND c.statecode = 'CO'
+    LEFT JOIN catalist.co_phones_20200417 d ON a.DWID = d.DWID
+    AND d.statecode = 'CO'
+    LEFT JOIN catalist.co_districts_20231204 e ON a.DWID = e.DWID
+    AND e.statecode = 'CO'
+GROUP BY
+    1
+ORDER BY
+    1
