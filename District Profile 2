@@ -1,0 +1,34 @@
+SELECT
+    CAST(statesenatedistrict AS FLOAT),
+    SUM(
+        CASE
+            WHEN voterstatus = 'active' THEN 1
+            ELSE 0
+        END
+    ) AS active,
+    SUM(
+        CASE
+            WHEN voterstatus = 'inactive' THEN 1
+            ELSE 0
+        END
+    ) AS inactive,
+    SUM(
+        CASE
+            WHEN voterstatus = 'dropped' THEN 1
+            ELSE 0
+        END
+    ) AS dropped,
+    SUM(
+        CASE
+            WHEN voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS registered
+FROM
+    dbt_prod.int_catalist_binned_universe_final
+WHERE
+    statecode = 'CO'
+GROUP BY
+    1
+ORDER BY
+    1
