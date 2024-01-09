@@ -1,0 +1,1649 @@
+SELECT
+    congressionaldistrict,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_partyreg = 'DEM' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS dem_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_partyreg = 'REP' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS rep_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_partyreg = 'UNAFFLIATED' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS npa_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_partyreg = '3RD' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS third_reg_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_partyreg = 'DEM' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS dem_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_partyreg = 'REP' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS rep_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_partyreg = 'UNAFFLIATED' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS npa_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_partyreg = '3RD' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS third_share_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_partyreg = 'DEM' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS dem_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_partyreg = 'REP' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS rep_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_partyreg = 'UNAFFLIATED' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS npa_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_partyreg = '3RD' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS third_reg_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_partyreg = 'DEM' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS dem_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_partyreg = 'REP' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS rep_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_partyreg = 'UNAFFLIATED' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS npa_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_partyreg = '3RD' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS third_share_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_age = '18-34' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_18_34_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_age = '35-49' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_35_49_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_age = '50-64' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_50_64_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_age = '65+' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_65_reg_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_age = '18-34' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_18_34_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_age = '35-49' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_35_49_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_age = '50-64' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_50_64_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_age = '65+' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_65_share_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_age = '18-34' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_18_34_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_age = '35-49' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_35_49_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_age = '50-64' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_50_64_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_age = '65+' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_65_reg_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_age = '18-34' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_18_34_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_age = '35-49' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_35_49_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_age = '50-64' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_50_64_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_age = '65+' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_65_share_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_race = 'AAPI' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS aapi_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_race = 'Black' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS black_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_race = 'Latinx' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS latinx_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_race = 'White' THEN registered_voters_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS white_reg_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2020 > 0
+                AND bin_race = 'Unknown / Other' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS other_reg_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_race = 'AAPI' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS aapi_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_race = 'Black' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS black_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_race = 'Latinx' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS latinx_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_race = 'White' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS white_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2020 > 0
+                    AND bin_race = 'Unknown / Other' THEN registered_voters_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2020 > 0 THEN registered_voters_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS other_share_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_race = 'AAPI' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS aapi_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_race = 'Black' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS black_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_race = 'Latinx' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS latinx_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_race = 'White' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS other_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN registered_voters_2022 > 0
+                AND bin_race = 'Unknown / Other' THEN registered_voters_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS white_reg_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_race = 'AAPI' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS aapi_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_race = 'Black' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS black_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_race = 'Latinx' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS latinx_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_race = 'White' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS white_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN registered_voters_2022 > 0
+                    AND bin_race = 'Unknown / Other' THEN registered_voters_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN registered_voters_2022 > 0 THEN registered_voters_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS other_share_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_partyreg = 'DEM' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS dem_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_partyreg = 'REP' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS rep_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_partyreg = 'UNAFFLIATED' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS npa_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_partyreg = '3RD' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS third_votes_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_partyreg = 'DEM' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS dem_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_partyreg = 'REP' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS rep_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_partyreg = 'UNAFFLIATED' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS npa_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_partyreg = '3RD' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS third_vote_share_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_partyreg = 'DEM' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS dem_votes_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_partyreg = 'REP' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS rep_votes_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_partyreg = 'UNAFFLIATED' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS npa_votes_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_partyreg = '3RD' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS third_votes_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_partyreg = 'DEM' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS dem_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_partyreg = 'REP' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS rep_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_partyreg = 'UNAFFLIATED' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS npa_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_partyreg = '3RD' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS third_vote_share_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_age = '18-34' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_18_34_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_age = '35-49' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_35_49_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_age = '50-64' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_50_64_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_age = '65+' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_65_votes_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_age = '18-34' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_18_34_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_age = '35-49' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_35_49_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_age = '50-64' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_50_64_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_age = '65+' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_65_vote_share_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_age = '18-34' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_18_34_votes_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_age = '35-49' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_35_49_votes_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_age = '50-64' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_50_64_votes_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_age = '65+' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS age_65_votes_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_age = '18-34' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_18_34_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_age = '35-49' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_35_49_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_age = '50-64' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_50_64_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_age = '65+' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS age_65_vote_share_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_race = 'AAPI' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS aapi_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_race = 'Black' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS black_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_race = 'Latinx' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS latinx_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_race = 'White' THEN votes_2020
+                ELSE 0
+            END
+        ),
+        0
+    ) AS white_votes_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2020 > 0
+                AND bin_race = 'Unknown / Other' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS other_votes_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_race = 'AAPI' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS aapi_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_race = 'Black' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS black_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_race = 'Latinx' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS latinx_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_race = 'White' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS white_vote_share_20,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2020 > 0
+                    AND bin_race = 'Unknown / Other' THEN votes_2020
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2020 > 0 THEN votes_2020
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS other_vote_share_20,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_race = 'AAPI' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS aapi_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_race = 'Black' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS black_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_race = 'Latinx' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS latinx_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_race = 'White' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS white_reg_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_2022 > 0
+                AND bin_race = 'Unknown / Other' THEN votes_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS other_reg_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_race = 'AAPI' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS aapi_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_race = 'Black' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS black_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_race = 'Latinx' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS latinx_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_race = 'White' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS white_vote_share_22,
+    ROUND(
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN votes_2022 > 0
+                    AND bin_race = 'Unknown / Other' THEN votes_2022
+                    ELSE 0
+                END
+            ) / NULLIF(
+                SUM(
+                    CASE
+                        WHEN votes_2022 > 0 THEN votes_2022
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
+            0
+        ),
+        4
+    ) * 100 AS other_vote_share_22,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_avev_vbm_2022 > 0 THEN votes_avev_vbm_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS mail_votes_2022,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_avev_inperson_2022 > 0 THEN votes_avev_inperson_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS eip_votes_2022,
+    ROUND(
+        SUM(
+            CASE
+                WHEN votes_eday_2022 > 0 THEN votes_eday_2022
+                ELSE 0
+            END
+        ),
+        0
+    ) AS eday_voted_2022
+FROM
+    dbt_prod.fact_votehistory_agg_wide
+WHERE
+    statecode = 'CO'
+GROUP BY
+    1
+ORDER BY
+    1
