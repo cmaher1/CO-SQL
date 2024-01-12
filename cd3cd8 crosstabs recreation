@@ -1,0 +1,49 @@
+SELECT
+    race_subquery.race,
+    voteprop_subquery.voteprop_bucket,
+    e.congressionaldistrict,
+    e.countyname,
+    e.precinctcode,
+    SUM(
+        CASE
+            WHEN b.race = race_subquery.race
+            AND b.bin_voteprop_decile = voteprop_subquery.voteprop_bucket
+            AND b.voterstatus IN ('active', 'inactive') THEN 1
+            ELSE 0
+        END
+    ) AS count
+FROM
+    catalist.co_person_20231204 a
+    LEFT JOIN dbt_prod.int_catalist_binned_universe_final b ON a.DWID = b.DWID
+    AND b.statecode = 'CO'
+    LEFT JOIN catalist.co_districts_20231204 e ON a.DWID = e.DWID
+    AND e.statecode = 'CO'
+    /* Other joins as per your original query */
+    ,
+    (
+        SELECT 'black' AS race UNION ALL
+        SELECT 'hispanic' AS race UNION ALL
+        SELECT 'asian' AS race UNION ALL
+        SELECT 'nativeAmerican' AS race UNION ALL
+        SELECT 'other' AS race
+    ) AS race_subquery,
+    (
+        SELECT '0-10' AS voteprop_bucket UNION ALL
+        SELECT '10-20' AS voteprop_bucket UNION ALL
+        SELECT '20-30' AS voteprop_bucket UNION ALL
+        SELECT '30-40' AS voteprop_bucket UNION ALL
+        SELECT '40-50' AS voteprop_bucket UNION ALL
+        SELECT '50-60' AS voteprop_bucket UNION ALL
+        SELECT '60-70' AS voteprop_bucket UNION ALL
+        SELECT '70-80' AS voteprop_bucket UNION ALL
+        SELECT '80-90' AS voteprop_bucket UNION ALL
+        SELECT '90-100' AS voteprop_bucket
+    ) AS voteprop_subquery
+WHERE
+    e.congressionaldistrict IN ('3', '8')
+GROUP BY
+    1,
+    2,
+    3,
+    4,
+    5
