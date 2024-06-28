@@ -1,1 +1,21 @@
+SELECT
+  congressionaldistrict,
+  STRING_AGG(FORMAT('%s(%.1f%%)', countyname, (unique_voter_count / total_voters_in_county * 100)), ', ') AS county_distribution
+FROM (
+  SELECT
+    congressionaldistrict,
+    countyname,
+    COUNT(DISTINCT DWID) AS unique_voter_count,
+    SUM(COUNT(DISTINCT DWID)) OVER (PARTITION BY countyname) AS total_voters_in_county
+  FROM
+    `av-national.dbt_prod.core_voterfile_active`
+  WHERE
+    statecode = 'CO'
+  GROUP BY
+    congressionaldistrict, countyname
+)
+GROUP BY
+  congressionaldistrict
+ORDER BY
+  CAST(congressionaldistrict AS INT);
 
