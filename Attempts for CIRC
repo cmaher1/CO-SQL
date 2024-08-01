@@ -1,0 +1,68 @@
+WITH attempt_data AS (
+  SELECT
+    a.contacttypename,
+    a.attemptid,
+    a.datecanvassed,
+    b.statehousedistrict,
+    b.statesenatedistrict
+  FROM
+    `av-states.dbt_prod_views.core_attempt` a
+  JOIN
+    `av-states.dbt_prod_views.core_voterfile_active` b
+  ON
+    a.dwid = b.dwid
+  WHERE
+    a.statecode = 'CO'
+    AND a.datecanvassed BETWEEN '2024-07-01 00:00:00 UTC' AND '2024-08-01 00:00:00 UTC'
+    AND a.committeeshortname = 'CIRCAF'
+)
+
+-- Aggregate attempts by district and contact type
+SELECT
+  district_data.district,
+  district_data.district_type,
+  a.contacttypename,
+  COUNT(a.attemptid) AS attempt_count
+FROM
+  attempt_data a
+JOIN (
+  -- State House districts
+  SELECT DISTINCT
+    CAST(b.statehousedistrict AS STRING) AS district,
+    'HD' AS district_type
+  FROM
+    `av-states.dbt_prod_views.core_attempt` a
+  LEFT JOIN
+    `av-states.dbt_prod_views.core_voterfile_active` b ON a.dwid = b.dwid
+  WHERE
+    a.statecode = 'CO'
+    AND a.datecanvassed BETWEEN '2024-07-01 00:00:00 UTC' AND '2024-08-01 00:00:00 UTC'
+    AND a.committeeshortname = 'CIRCAF'
+
+  UNION ALL
+
+  -- State Senate districts
+  SELECT DISTINCT
+    CAST(b.statesenatedistrict AS STRING) AS district,
+    'SD' AS district_type
+  FROM
+    `av-states.dbt_prod_views.core_attempt` a
+  LEFT JOIN
+    `av-states.dbt_prod_views.core_voterfile_active` b ON a.dwid = b.dwid
+  WHERE
+    a.statecode = 'CO'
+    AND a.datecanvassed BETWEEN '2024-07-01 00:00:00 UTC' AND '2024-08-01 00:00:00 UTC'
+    AND a.committeeshortname = 'CIRCAF'
+) district_data
+ON
+  (CAST(a.statehousedistrict AS STRING) = district_data.district AND district_data.district_type = 'HD')
+  OR
+  (CAST(a.statesenatedistrict AS STRING) = district_data.district AND district_data.district_type = 'SD')
+GROUP BY
+  district_data.district,
+  district_data.district_type,
+  a.contacttypename
+ORDER BY
+  district_data.district_type,
+  CAST(district_data.district AS INT64),
+  a.contacttypename;
