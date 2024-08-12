@@ -1,13 +1,24 @@
 SELECT
+  CONCAT(UPPER(SUBSTRING(b.countyname, 1, 1)), LOWER(SUBSTRING(b.countyname, 2))) AS County, -- Capitalize the first letter
   b.precinctcode,
   b.precinctname,
-  CAST(LEFT(b.precinctcode, 1) AS INT) AS congressionaldistrict,
+  CAST(REGEXP_EXTRACT(b.precinctname, r'CONG-(\d+)') AS INT64) AS congressionaldistrict, -- Extract congressional district number
+  CAST(REGEXP_EXTRACT(b.precinctname, r'SS-(\d+)') AS INT64) AS state_senate, -- Extract state senate number
+  CAST(REGEXP_EXTRACT(b.precinctname, r'SH-(\d+)') AS INT64) AS state_house, -- Extract state house number
   COUNT(DISTINCT a.dwid) AS total_voters,
   COUNT(DISTINCT b.van_householdid_door) AS doors,
   ROUND(SUM(CASE
         WHEN b.race IN ('asian', 'black', 'hispanic', 'nativeAmerican') THEN 1
         ELSE 0
     END) / NULLIF(COUNT(DISTINCT a.dwid), 0) * 100, 2) AS BIPOC_percentage,
+  SUM(CASE
+        WHEN b.race = 'hispanic' THEN 1
+        ELSE 0
+    END) AS latine_count,
+  ROUND(SUM(CASE
+        WHEN b.race = 'hispanic' THEN 1
+        ELSE 0
+    END) / NULLIF(COUNT(DISTINCT a.dwid), 0) * 100, 2) AS latine_percentage,
   COUNT(DISTINCT c.dwid) AS step1_voters,
   ROUND(COUNT(DISTINCT c.dwid) / NULLIF(COUNT(DISTINCT a.dwid), 0) * 100, 2) AS step1_percentage,
   COUNT(DISTINCT d.dwid) AS step2_voters,
@@ -15,7 +26,7 @@ SELECT
   COUNT(DISTINCT e.dwid) AS step3_voters,
   ROUND(COUNT(DISTINCT e.dwid) / NULLIF(COUNT(DISTINCT a.dwid), 0) * 100, 2) AS step3_percentage
 FROM
-  `av-states.cmaher.20240723_AV_Universe` a
+  `av-states.cmaher.20240812_CIRC_Adams` a
 LEFT JOIN
   `av-national.dbt_prod.core_voterfile_active` b
 ON
@@ -39,8 +50,11 @@ WHERE
   AND b.voterstatus IN ('active', 'inactive')
   AND b.geo_is_canvassable = 1
 GROUP BY
+  County,
   b.precinctcode,
   b.precinctname,
-  CAST(LEFT(b.precinctcode, 1) AS INT)
+  congressionaldistrict,
+  state_senate,
+  state_house
 ORDER BY
   (step1_percentage * 0.6 + BIPOC_percentage * 0.4) DESC;
