@@ -1,0 +1,94 @@
+WITH weighted_data AS (
+    SELECT
+        CONCAT(UPPER(SUBSTRING(b.countyname, 1, 1)), LOWER(SUBSTRING(b.countyname, 2))) AS County, -- Capitalize the first letter
+        a.precinctcode,
+        a.precinctname,
+        a.congressionaldistrict,
+        a.state_senate,
+        a.state_house,
+        a.total_voters,
+        a.doors,
+        IFNULL(a.BIPOC_percentage, 0) AS BIPOC_percentage,  -- Handle null values
+        a.latine_count,
+        a.latine_percentage,
+        a.step1_voters,
+        a.step1_percentage,
+        a.step2_voters,
+        a.step2_percentage,
+        a.step3_voters,
+        a.step3_percentage,
+        IFNULL(b.bin_precinct_canvassability, 'Unknown') AS bin_precinct_canvassability,  -- Handle null values
+        -- Assign weights to the canvassability categories
+        CASE
+            WHEN b.bin_precinct_canvassability = 'Best Canvassable' THEN 0.8
+            WHEN b.bin_precinct_canvassability = 'Highly Canvassable' THEN 0.1
+            WHEN b.bin_precinct_canvassability = 'Canvassable' THEN 0.75
+            WHEN b.bin_precinct_canvassability = 'Somewhat Canvassable' THEN 0.25
+            WHEN b.bin_precinct_canvassability IN ('Not Canvassable', 'Unknown Canvassability') THEN 0.0
+            ELSE 0.0
+        END AS canvassability_weight
+    FROM
+        `av-states.cmaher.20240812_CIRC_Adams_Initial` a
+    LEFT JOIN
+        `av-national.canvassability.co_core_precinct_canvassability` b
+    ON
+        a.precinctcode = b.uniqueprecinctcode
+),
+-- Calculate the final score incorporating the canvassability weight
+final_scores AS (
+    SELECT
+        County,
+        precinctcode,
+        precinctname,
+        congressionaldistrict,
+        state_senate,
+        state_house,
+        total_voters,
+        doors,
+        BIPOC_percentage,
+        latine_count,
+        latine_percentage,
+        step1_voters,
+        step1_percentage,
+        step2_voters,
+        step2_percentage,
+        step3_voters,
+        step3_percentage,
+        bin_precinct_canvassability,
+        canvassability_weight,
+        -- Calculate the weighted score
+        (canvassability_weight * 0.8 +
+        step1_percentage * 0.05 +
+        BIPOC_percentage * 0.15 ) AS final_score
+    FROM
+        weighted_data
+    -- Optionally exclude or deprioritize certain categories
+    WHERE
+        bin_precinct_canvassability <> 'Canvassable'  -- Exclude 'Canvassable' if needed
+)
+
+-- Select and order by the final score
+SELECT
+    County,
+    precinctcode,
+    precinctname,
+    congressionaldistrict,
+    state_senate,
+    state_house,
+    total_voters,
+    doors,
+    BIPOC_percentage,
+    latine_count,
+    latine_percentage,
+    step1_voters,
+    step1_percentage,
+    step2_voters,
+    step2_percentage,
+    step3_voters,
+    step3_percentage,
+    bin_precinct_canvassability,
+    final_score
+FROM
+    final_scores
+ORDER BY
+    final_score DESC
