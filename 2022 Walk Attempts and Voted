@@ -1,0 +1,32 @@
+WITH attempt_counts AS (
+    SELECT
+        b.dwid,
+        COUNT(DISTINCT b.attemptid) AS distinct_attempts
+    FROM
+        `av-states.dbt_prod_views.core_attempt` b
+    WHERE
+        b.contacttypename = 'Walk'
+        AND b.daycanvassed BETWEEN '2022-01-01 00:00:00 UTC' AND '2022-11-01 00:00:00 UTC'
+    GROUP BY
+        b.dwid
+)
+
+SELECT
+    a.dwid,
+    a.gender,
+    a.race,
+    a.catalist_voteprop24,
+    a.catalist_vci24,
+    COALESCE(ac.distinct_attempts, 0) AS distinct_attempts,
+    CASE
+        WHEN a.e2022gvm IS NOT NULL THEN 1
+        ELSE 0
+    END AS Voted
+FROM
+    `av-states.dbt_prod_views.core_voterfile_active` a
+LEFT JOIN
+    attempt_counts ac
+ON
+    a.dwid = ac.dwid
+WHERE
+    a.statecode = 'CO';
