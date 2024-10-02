@@ -1,0 +1,79 @@
+SELECT
+  b.congressionaldistrict,
+  COUNT(DISTINCT a.VOTER_ID) AS voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'ACN' THEN 1
+  END
+    ) AS acn_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'UNI' THEN 1
+  END
+    ) AS uni_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'CTR' THEN 1
+  END
+    ) AS ctr_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'NOL' THEN 1
+  END
+    ) AS nol_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'LBR' THEN 1
+  END
+    ) AS lbr_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'REP' THEN 1
+  END
+    ) AS rep_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'UAF' THEN 1
+  END
+    ) AS uaf_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'APV' THEN 1
+  END
+    ) AS apv_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'DEM' THEN 1
+  END
+    ) AS dem_voter_count,
+  COUNT(CASE
+      WHEN a.PARTY = 'FWD' THEN 1
+  END
+    ) AS fwd_voter_count,
+  COUNT(CASE
+      WHEN a.GENDER = 'MALE' THEN 1
+  END
+    ) AS male_voter_count,
+  COUNT(CASE
+      WHEN a.GENDER IS NULL THEN 1
+  END
+    ) AS null_gender_count,
+  COUNT(CASE
+      WHEN a.GENDER = 'FEMALE' THEN 1
+  END
+    ) AS female_voter_count,
+  COUNT(CASE
+      WHEN a.VOTED_PARTY = 'DEM' THEN 1
+  END
+    ) AS votedparty_dem_count,
+  COUNT(CASE
+      WHEN a.VOTED_PARTY = 'REP' THEN 1
+  END
+    ) AS votedparty_rep_count,
+  COUNT(CASE
+      WHEN a.VOTED_PARTY IS NULL OR a.VOTED_PARTY = '' THEN 1
+  END
+    ) AS votedparty_blank_count
+FROM
+  `av-states.cmaher.20240625_Primary_Voted` a
+LEFT JOIN
+  `av-national.dbt_prod.core_voterfile_active` b
+ON
+  CAST(a.VOTER_ID AS STRING) = b.statefileid
+WHERE
+  b.statecode = 'CO'
+GROUP BY
+  1
+ORDER BY
+  1
