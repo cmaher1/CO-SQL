@@ -1,0 +1,34 @@
+SELECT
+  b.precinctcode,
+  b.precinctname,
+  CAST(LEFT(b.precinctcode, 1) AS INT) AS congressionaldistrict,
+  COUNT(DISTINCT a.dwid) AS total_voters,
+  COUNT(DISTINCT b.van_householdid_door) AS doors,
+  ROUND(SUM(CASE
+        WHEN b.race IN ('asian', 'black', 'hispanic', 'nativeAmerican') THEN 1
+        ELSE 0
+    END) / NULLIF(COUNT(DISTINCT a.dwid), 0) * 100, 2) AS BIPOC_percentage,
+  COUNT(DISTINCT c.dwid) AS step1_voters,
+  ROUND(COUNT(DISTINCT c.dwid) / NULLIF(COUNT(DISTINCT a.dwid), 0) * 100, 2) AS step1_percentage
+FROM
+  `av-states.cmaher.20240814_AV_Universe` a
+LEFT JOIN
+  `av-national.dbt_prod.core_voterfile_active` b
+ON
+  a.dwid = b.dwid
+LEFT JOIN
+  `av-states.cmaher.20240814_AV_Universe_Step1` c
+ON
+  a.dwid = c.dwid
+WHERE
+  b.statecode = 'CO'
+        AND b.van_householdid_door IS NOT NULL
+        AND b.deceased IS FALSE
+        AND b.voterstatus IN ('active', 'inactive')
+        AND b.geo_is_canvassable = 1
+GROUP BY
+  b.precinctcode,
+  b.precinctname,
+  CAST(LEFT(b.precinctcode, 1) AS INT)
+ORDER BY
+  (step1_percentage * 0.6 + BIPOC_percentage * 0.4) DESC;
