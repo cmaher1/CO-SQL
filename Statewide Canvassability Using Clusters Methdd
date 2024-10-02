@@ -1,0 +1,44 @@
+WITH universe AS (
+    SELECT DISTINCT
+        v.van_householdid_door AS door,
+        v.reglongitude,
+        v.reglatitude,
+        v.regaddriswalkable,
+        v.reglatlongtype
+    FROM `av-national.dbt_prod.core_voterfile` v
+    LEFT JOIN `av-national.universes.all_universes_2024_enr` u
+    USING(dwid, statecode)
+    WHERE
+        v.statecode = 'CO'
+        AND v.van_householdid_door IS NOT NULL
+        AND v.deceased IS FALSE
+        AND v.voterstatus IN ('active', 'inactive')
+        AND u.univ_name IS NOT NULL
+),
+universe_geos AS (
+  SELECT 
+    door,
+    ST_GEOGPOINT(reglongitude, reglatitude) AS door_geo
+  FROM universe
+  WHERE regaddriswalkable IS TRUE
+    AND reglatlongtype = 'StreetAddr'
+),
+all_clusters AS (
+  SELECT
+    door,
+    ST_CLUSTERDBSCAN(door_geo, 800, 2) OVER() AS cluster_id
+  FROM universe_geos
+),
+canvassable_clusters AS (
+  SELECT
+    cluster_id,
+    COUNT(door) AS doors_in_cluster
+  FROM all_clusters
+  WHERE cluster_id IS NOT NULL
+  GROUP BY cluster_id
+  HAVING COUNT(door) >= 30
+)
+SELECT
+  SUM(canvassable_clusters.doors_in_cluster) AS canvassable_doors,
+  SUM(canvassable_clusters.doors_in_cluster) / (SELECT COUNT(door) FROM universe) AS percent_canvassable
+FROM canvassable_clusters;
