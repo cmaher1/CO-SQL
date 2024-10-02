@@ -1,0 +1,68 @@
+WITH universe AS (
+    SELECT DISTINCT
+        b.van_householdid_door AS door,
+        b.reglongitude,
+        b.reglatitude,
+        b.uniqueprecinctcode AS precinctcode,
+        b.geo_is_canvassable
+    FROM `av-states.cmaher.20240814_AV_Universe` a
+    LEFT JOIN `av-states.dbt_prod_views.core_voterfile_active` b
+    ON a.dwid = b.dwid
+    WHERE
+        b.statecode = 'CO'
+        AND b.van_householdid_door IS NOT NULL
+        AND b.deceased IS FALSE
+        AND b.voterstatus IN ('active', 'inactive')
+        AND b.geo_is_canvassable = 1
+),
+-- Count the number of houses in each precinct
+precinct_counts AS (
+    SELECT
+        precinctcode,
+        COUNT(DISTINCT door) AS house_count
+    FROM universe
+    GROUP BY precinctcode
+),
+-- Calculate distances between each pair of houses in the same precinct
+distance_calculations AS (
+    SELECT
+        a.precinctcode,
+        ST_Distance(
+            ST_GEOGPOINT(a.reglongitude, a.reglatitude),
+            ST_GEOGPOINT(b.reglongitude, b.reglatitude)
+        ) AS distance
+    FROM universe a
+    JOIN universe b
+    ON a.precinctcode = b.precinctcode
+    AND a.door <> b.door
+),
+-- Compute average distance for each precinct
+avg_distances AS (
+    SELECT
+        precinctcode,
+        AVG(distance) AS avg_distance
+    FROM distance_calculations
+    GROUP BY precinctcode
+),
+-- Classify precincts into density categories based on average distance
+precinct_density AS (
+    SELECT
+        p.precinctcode,
+        p.house_count,
+        d.avg_distance,
+        CASE
+            WHEN d.avg_distance <= 100 THEN 'High Density'
+            WHEN d.avg_distance <= 500 THEN 'Medium Density'
+            ELSE 'Low Density'
+        END AS density_category
+    FROM precinct_counts p
+    LEFT JOIN avg_distances d
+    ON p.precinctcode = d.precinctcode
+)
+SELECT
+    precinctcode,
+    house_count,
+    avg_distance,
+    density_category
+FROM precinct_density
+ORDER BY avg_distance;
