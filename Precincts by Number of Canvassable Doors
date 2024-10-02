@@ -1,0 +1,105 @@
+WITH precinct_canvassability AS (
+    SELECT DISTINCT
+        a.precinctcode,
+        b.bin_canvassability,
+        a.van_householdid_door
+    FROM `av-states.dbt_prod_views.core_voterfile_active` a
+    LEFT JOIN `av-national.canvassability.co_core_door_canvassability` b
+    ON a.van_householdid_door = b.van_householdid_door
+    WHERE a.statecode = 'CO'
+),
+-- Count the number of each canvassability status and NULL values per precinct
+status_summary AS (
+    SELECT
+        precinctcode,
+        COUNT(DISTINCT CASE WHEN bin_canvassability = 'Best Canvassable' THEN van_householdid_door END) AS best_canvassable_count,
+        COUNT(DISTINCT CASE WHEN bin_canvassability = 'Highly Canvassable' THEN van_householdid_door END) AS highly_canvassable_count,
+        COUNT(DISTINCT CASE WHEN bin_canvassability = 'Somewhat Canvassable' THEN van_householdid_door END) AS somewhat_canvassable_count,
+        COUNT(DISTINCT CASE WHEN bin_canvassability = 'Not Canvassable' THEN van_householdid_door END) AS not_canvassable_count,
+        COUNT(DISTINCT CASE WHEN bin_canvassability IS NULL THEN van_householdid_door END) AS null_count
+    FROM precinct_canvassability
+    GROUP BY precinctcode
+),
+-- Calculate normalized counts for each category
+normalized_counts AS (
+    SELECT
+        precinctcode,
+        best_canvassable_count,
+        highly_canvassable_count,
+        somewhat_canvassable_count,
+        not_canvassable_count,
+        null_count,
+        -- Normalize counts by dividing by the maximum count in each category
+        best_canvassable_count / NULLIF(MAX(best_canvassable_count) OVER(), 0) AS norm_best_canvassable,
+        highly_canvassable_count / NULLIF(MAX(highly_canvassable_count) OVER(), 0) AS norm_highly_canvassable,
+        somewhat_canvassable_count / NULLIF(MAX(somewhat_canvassable_count) OVER(), 0) AS norm_somewhat_canvassable,
+        not_canvassable_count / NULLIF(MAX(not_canvassable_count) OVER(), 0) AS norm_not_canvassable
+    FROM status_summary
+),
+-- Calculate weighted score based on specific weights
+weighted_scores AS (
+    SELECT
+        precinctcode,
+        best_canvassable_count,
+        highly_canvassable_count,
+        somewhat_canvassable_count,
+        not_canvassable_count,
+        null_count,
+        -- Calculate weighted score with given weights
+        (norm_best_canvassable * 0.5 + 
+         norm_highly_canvassable * 0.3 + 
+         norm_somewhat_canvassable * 0.2) AS weighted_score
+    FROM normalized_counts
+),
+-- Rank precincts and assign quartile ranks
+ranked_precincts AS (
+    SELECT
+        precinctcode,
+        best_canvassable_count,
+        highly_canvassable_count,
+        somewhat_canvassable_count,
+        not_canvassable_count,
+        null_count,
+        weighted_score,
+        NTILE(4) OVER (ORDER BY weighted_score DESC) AS quartile
+    FROM weighted_scores
+),
+-- Assign category based on quartile and sort according to category priority
+categorized_precincts AS (
+    SELECT
+        precinctcode,
+        best_canvassable_count,
+        highly_canvassable_count,
+        somewhat_canvassable_count,
+        not_canvassable_count,
+        null_count,
+        weighted_score,
+        quartile,
+        CASE
+            WHEN quartile = 1 THEN 'Best'
+            WHEN quartile = 2 THEN 'Highly Canvassable'
+            WHEN quartile = 3 THEN 'Somewhat Canvassable'
+            WHEN quartile = 4 THEN 'Not Canvassable'
+        END AS canvassability_category
+    FROM ranked_precincts
+)
+
+-- Final selection with sorting based on desired category priority
+SELECT
+    precinctcode,
+    best_canvassable_count,
+    highly_canvassable_count,
+    somewhat_canvassable_count,
+    not_canvassable_count,
+    null_count,
+    weighted_score,
+    canvassability_category
+FROM categorized_precincts
+ORDER BY
+    CASE canvassability_category
+        WHEN 'Best' THEN 1
+        WHEN 'Highly Canvassable' THEN 2
+        WHEN 'Somewhat Canvassable' THEN 3
+        WHEN 'Not Canvassable' THEN 4
+    END,
+    precinctcode;
