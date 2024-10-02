@@ -1,0 +1,15 @@
+SELECT
+  b.bucket_electorate_24,
+  COUNT(DISTINCT a.dwid)
+FROM
+  `av-states.cmaher.20240814_AV_Universe` a
+LEFT JOIN
+  `av-national.dbt_prod.core_voterfile_active` b
+ON
+  a.dwid = b.DWID
+WHERE
+  b.statecode = 'CO'
+GROUP BY
+  1
+ORDER BY
+  1
