@@ -1,0 +1,51 @@
+with univ as (
+  select distinct
+    statecode,
+    dwid,
+    congressionaldistrict
+  from av-national.universes.all_universes_2024_enr
+  where
+    statecode = 'CO'
+    and is_umbrella_canvass = 1
+    and congressionaldistrict is not null
+),
+attempted as (
+  select
+    att.statecode,
+    att.dwid,
+    att.congressionaldistrict,
+    count(distinct attemptid) as attempts,
+    count(distinct is_contact) as contacts
+  from av-national.dbt_prod.core_attempt as att
+  inner join univ
+    on att.dwid = univ.dwid
+    and att.statecode = univ.statecode
+  where
+    attempt_mode = 'Doors'
+    and datecanvassed > '2024-06-26'
+  group by 1, 2, 3
+),
+counts as (
+  select
+    univ.statecode,
+    univ.congressionaldistrict,
+    count(distinct univ.dwid) as total_univ,
+    countif(attempts > 0 and (contacts is null or contacts = 0)) as n_att_not_ctc,
+    countif(contacts > 0) as n_ctc,
+    countif(attempts is null) as n_not_att,
+    avg(attempts) as avg_att_per_att_person
+  from univ
+  left join attempted
+    on univ.dwid = attempted.dwid
+    and univ.statecode = attempted.statecode
+    and univ.congressionaldistrict = attempted.congressionaldistrict
+  group by 1, 2
+)
+select
+  *,
+  safe_divide(n_att_not_ctc, total_univ) as pct_att_not_ctc,
+  safe_divide(n_ctc, total_univ) as pct_att_and_ctc,
+  safe_divide(n_not_att, total_univ) as pct_not_att
+from counts
+where congressionaldistrict is not null
+order by congressionaldistrict;
