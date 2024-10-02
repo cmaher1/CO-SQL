@@ -1,0 +1,21 @@
+SELECT
+  c.bin_precinct_canvassability,
+  COUNT(DISTINCT a.dwid) AS count_of_individuals
+FROM
+  `av-states.cmaher.20240814_AV_Universe` a
+LEFT JOIN
+  `av-states.dbt_prod_views.core_voterfile_active` b
+ON
+  a.dwid = b.dwid
+LEFT JOIN
+  `av-national.canvassability.co_core_precinct_canvassability` c
+ON
+  b.uniqueprecinctcode = c.uniqueprecinctcode
+WHERE
+  van_householdid_door IS NOT NULL
+  AND b.deceased IS FALSE
+  AND b.voterstatus IN ('active',
+    'inactive')
+  AND b.geo_is_canvassable = 1
+GROUP BY
+  1
