@@ -1,0 +1,130 @@
+CREATE OR REPLACE TABLE `av-states.cmaher.20240625_Primary_Voted_Extended` AS
+WITH contact_counts AS (
+  SELECT
+    DWID,
+    committeename AS Committee,
+    SUM(CASE WHEN contacttypename = 'Bulk Mail' THEN 1 ELSE 0 END) AS Mail_Attempts,
+    SUM(CASE WHEN contacttypename = 'Phone' THEN 1 ELSE 0 END) AS Phone_Attempts,
+    SUM(CASE WHEN contacttypename = 'SMS Text' THEN 1 ELSE 0 END) AS SMS_Text_Attempts,
+    SUM(CASE WHEN contacttypename = 'Walk' THEN 1 ELSE 0 END) AS Canvass_Attempts,
+    SUM(CASE WHEN contacttypename IS NOT NULL THEN 1 ELSE 0 END) AS Total_Attempts
+  FROM
+    `av-states.dbt_prod_views.base_vc_vansync_av_attempts`
+  WHERE
+    statecode = 'CO'
+    AND datecanvassed BETWEEN TIMESTAMP('2024-05-01 00:00:00 UTC') AND TIMESTAMP('2024-06-25 23:59:59 UTC')
+    AND contacttypename IS NOT NULL
+    AND contacttypename IN ('Bulk Mail', 'Phone', 'SMS Text', 'Walk')
+    AND DWID IS NOT NULL
+  GROUP BY
+    DWID, committeename
+),
+filtered_attempts AS (
+  SELECT
+    DWID,
+    MAX(Committee) AS Committee,
+    MAX(CASE WHEN Total_Attempts > 0 THEN Mail_Attempts ELSE 0 END) AS Mail_Attempts,
+    MAX(CASE WHEN Total_Attempts > 0 THEN Phone_Attempts ELSE 0 END) AS Phone_Attempts,
+    MAX(CASE WHEN Total_Attempts > 0 THEN SMS_Text_Attempts ELSE 0 END) AS SMS_Text_Attempts,
+    MAX(CASE WHEN Total_Attempts > 0 THEN Canvass_Attempts ELSE 0 END) AS Canvass_Attempts,
+    MAX(CASE WHEN Total_Attempts > 0 THEN Total_Attempts ELSE 0 END) AS Total_Attempts
+  FROM
+    contact_counts
+  GROUP BY
+    DWID
+)
+SELECT
+  a.dwid,
+  a.congressionaldistrict AS Congressional,
+  a.statesenatedistrict AS State_Senate,
+  a.statehousedistrict AS State_House,
+  a.countyname AS County,
+  CASE 
+    WHEN a.partyaffiliation IN ('DEM', 'REP') THEN a.partyaffiliation
+    WHEN a.partyaffiliation IN ('UAF', 'NPA', 'OTH', 'UNK') THEN 'UNAFF'
+    WHEN a.partyaffiliation IN ('LBR', 'GRE') THEN '3RD'
+    WHEN b.PARTY IN ('REP', 'DEM') THEN b.PARTY
+    WHEN b.PARTY IN ('UAF') THEN 'UNAFF'
+    WHEN b.PARTY IN ('LBR', 'ACN', 'NOL', 'GRN', 'APV', 'CTR', 'INI') THEN '3RD'
+    ELSE NULL
+  END AS Party,
+  a.bin_vci_decile AS VCI_Decile,
+  CASE
+    WHEN a.bin_vci_decile = '0-10' THEN 1
+    WHEN a.bin_vci_decile = '10-20' THEN 2
+    WHEN a.bin_vci_decile = '20-30' THEN 3
+    WHEN a.bin_vci_decile = '30-40' THEN 4
+    WHEN a.bin_vci_decile = '40-50' THEN 5
+    WHEN a.bin_vci_decile = '50-60' THEN 6
+    WHEN a.bin_vci_decile = '60-70' THEN 7
+    WHEN a.bin_vci_decile = '70-80' THEN 8
+    WHEN a.bin_vci_decile = '80-90' THEN 9
+    WHEN a.bin_vci_decile = '90-100' THEN 10
+    ELSE NULL
+  END AS VCI_Decile_Sort_Order,
+  a.bin_voteprop_decile AS Vote_Prop_Decile,
+  a.bin_partyreg,
+  a.bin_age_decile AS Age,
+  CASE
+    WHEN a.bin_age_decile = '18-29' THEN 1
+    WHEN a.bin_age_decile = '30-39' THEN 2
+    WHEN a.bin_age_decile = '40-49' THEN 3
+    WHEN a.bin_age_decile = '50-59' THEN 4
+    WHEN a.bin_age_decile = '60-69' THEN 5
+    WHEN a.bin_age_decile = '70-79' THEN 6
+    WHEN a.bin_age_decile = '80+' THEN 7
+    ELSE NULL
+  END AS Age_Sort_Order,
+  a.bin_race AS Race,
+  CASE
+    WHEN b.GENDER IN ('FEMALE') THEN 'Female'
+    WHEN b.GENDER IN ('MALE') THEN 'Male'
+    WHEN b.GENDER IN ('NOT DISCLOSED','X') THEN 'X'
+    WHEN a.GENDER IN ('female') THEN 'Female'
+    WHEN a.GENDER IN ('male') THEN 'Male'
+    WHEN a.GENDER IN ('unspecified') THEN 'X'
+    ELSE NULL
+  END AS Gender,
+  CASE
+    WHEN a.bin_education = 'Likely Non-College' THEN 'a-Likely Non-College' 
+    WHEN a.bin_education = 'Somewhat Likely Non-College' THEN 'b-Somewhat Likely Non-College'
+    WHEN a.bin_education = 'Somewhat Likely College' THEN 'c-Somewhat Likely College'
+    WHEN a.bin_education = 'Likely College' THEN 'd-Likely College'
+    ELSE NULL
+  END AS Education,
+  CASE
+    WHEN a.bin_income = '0 - 50K' THEN 'a-0K - 50K'
+    WHEN a.bin_income = '50K - 100K' THEN 'b-50K - 100K'
+    WHEN a.bin_income = '100K - 150K' THEN 'c-100K - 150K'
+    WHEN a.bin_income = '150K+' THEN 'd-150K+'
+    ELSE NULL
+  END AS Income,
+  b.VOTER_ID,
+  b.YOB,
+  b.PARTY AS Voted_Party_Reg,
+  b.PRECINCT,
+  b.VOTE_METHOD AS Vote_Method,
+  b.VOTED_PARTY AS Party_Voted,
+  b.MAIL_BALLOT_SENT_DATE,
+  b.MAIL_BALLOT_RECEIVE_DATE,
+  b.IN_PERSON_VOTE_DATE,
+  COALESCE(f.Committee, 'Unknown') AS Committee,
+  COALESCE(f.Mail_Attempts, 0) AS Mail_Attempts,
+  COALESCE(f.Phone_Attempts, 0) AS Phone_Attempts,
+  COALESCE(f.SMS_Text_Attempts, 0) AS SMS_Text_Attempts,
+  COALESCE(f.Canvass_Attempts, 0) AS Canvass_Attempts,
+  COALESCE(f.Total_Attempts, 0) AS Total_Attempts
+FROM
+  `av-national.dbt_prod.core_voterfile_active` a
+LEFT JOIN
+  `av-states.cmaher.20240625_Primary_Voted` b
+ON
+  a.statefileid = CAST(b.VOTER_ID AS STRING)
+LEFT JOIN
+  filtered_attempts f
+ON
+  a.dwid = f.DWID
+WHERE
+  a.statecode = 'CO'
+  AND a.bin_vci_decile != 'no score'
+  AND a.bin_income IS NOT NULL;
