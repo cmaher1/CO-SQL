@@ -1,0 +1,54 @@
+WITH
+  polling_data AS (
+    SELECT 
+      uniqueID AS `Precinct ID`,  -- Unique polling place ID
+      Name AS `Location Name`, 
+      Full_address AS polling_address,
+      Latitude AS `Latitude`,  -- Include Latitude
+      Longitude AS `Longitude`,  -- Include Longitude
+      County,
+      Place_type,  -- Include Place_type to determine Site Type
+      Early_Voting_Schedule  -- Use consolidated early voting schedule
+    FROM 
+      `av-states.cmaher.20241012_s0_geocoded_polling_places`
+    WHERE 
+      County IS NOT NULL
+  ),
+  voter_data AS (
+    SELECT 
+      DISTINCT countyname,   -- Get distinct county names
+      countyfips            -- Select county FIPS codes
+    FROM 
+      `av-states.dbt_prod_views.core_voterfile_active`
+    WHERE 
+      countyname IS NOT NULL
+      AND statecode = 'CO'
+  )
+-- Return all unique locations with parsed addresses and joined county FIPS
+SELECT 
+  CASE 
+    WHEN poll.Place_type IN ('Dropbox', 'Drop-Off') THEN 'Dropbox'
+    WHEN poll.Place_type = 'In-Person' THEN 'Voter Convenience Center'
+    ELSE poll.Place_type  -- Default to the original value if unmatched
+  END AS `Site Type`,  -- Adjusted Site Type based on Place_type
+  poll.`Location Name`,  -- Location Name column
+  'www.govotecolorado.com' AS `Location Detail`,  -- Location Detail after Location Name
+  -- Extract street address, city, and ZIP code from the polling address
+  REGEXP_EXTRACT(poll.polling_address, r'^(.*?),') AS `Address`,
+  REGEXP_EXTRACT(poll.polling_address, r',\s*(.*?),\s*\w{2}\s*\d{5}$') AS `City`,
+  REGEXP_EXTRACT(poll.polling_address, r'(\d{5})$') AS `Zip`,
+  'Yes' AS `Is County Wide Location`,  -- Set to 'Yes' for all rows
+  v.countyfips AS `County FIPS`,  -- Joining County FIPS from voter_data
+  poll.`Latitude`,  -- Latitude column
+  poll.`Longitude`,  -- Longitude column
+  '' AS `Phone Number`,  -- Blank Phone Number column
+  '' AS `Early Vote Exceptions`,  -- Blank column for Early Vote Exceptions
+  'www.govotecolorado.com' AS `Early Voting Notes`,  -- Early Voting Notes column
+  poll.Early_Voting_Schedule,  -- Use consolidated early voting schedule
+  '' AS `PrecinctIds`  -- Blank column for PrecinctIds
+FROM 
+  polling_data poll
+LEFT JOIN 
+  voter_data v ON UPPER(poll.County) = UPPER(v.countyname)  -- Joining on county names
+ORDER BY 
+  poll.`Location Name`;
