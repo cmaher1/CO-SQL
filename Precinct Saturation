@@ -1,0 +1,47 @@
+WITH univ AS (
+  SELECT DISTINCT
+    statecode,
+    dwid,
+    uniqueprecinctcode
+  FROM av-national.universes.all_universes_2024_enr
+  WHERE
+    statecode = 'CO'
+    AND is_umbrella_canvass = 1
+    AND uniqueprecinctcode IS NOT NULL
+),
+attempted AS (
+  SELECT
+    att.statecode,
+    att.dwid,
+    att.uniqueprecinctcode,
+    COUNT(DISTINCT attemptid) AS attempts,
+    COUNT(DISTINCT is_contact) AS contacts
+  FROM av-national.dbt_prod.core_attempt AS att
+  INNER JOIN univ
+    ON att.dwid = univ.dwid
+    AND att.statecode = univ.statecode
+  WHERE
+    attempt_mode = 'Doors'
+    AND datecanvassed > '2024-06-26'
+  GROUP BY 1, 2, 3
+),
+counts AS (
+  SELECT
+    univ.uniqueprecinctcode,
+    COUNT(DISTINCT univ.dwid) AS total_univ,
+    COUNTIF(attempts > 0) AS n_attempted,
+    COUNTIF(contacts > 0) AS n_contacted
+  FROM univ
+  LEFT JOIN attempted
+    ON univ.dwid = attempted.dwid
+    AND univ.statecode = attempted.statecode
+    AND univ.uniqueprecinctcode = attempted.uniqueprecinctcode
+  GROUP BY 1
+)
+SELECT
+  uniqueprecinctcode,
+  SAFE_DIVIDE(n_attempted, total_univ) AS pct_attempted,
+  SAFE_DIVIDE(n_contacted, total_univ) AS pct_contacted
+FROM counts
+WHERE uniqueprecinctcode IS NOT NULL
+ORDER BY uniqueprecinctcode;
